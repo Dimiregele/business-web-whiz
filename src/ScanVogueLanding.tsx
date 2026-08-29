@@ -580,7 +580,7 @@ function ManagerDemo({ restaurantName }: { restaurantName: string }) {
               <span style={{ color: C.muted, whiteSpace: "nowrap" }}>{t.count}×</span>
             </div>
             <div style={{ height: 5, borderRadius: 999, background: "rgba(255,255,255,.06)", overflow: "hidden" }}>
-              <div style={{ height: "100%", width: `${(t.count / THEMES[0].count) * 100}%`, background: `linear-gradient(90deg, ${C.goldDeep}, ${C.goldLight})`, borderRadius: 999, transition: "width 1s cubic-bezier(.16,1,.3,1)" }} />
+              <div style={{ height: "100%", width: `${(t.count / Math.max(...THEMES.map((x) => x.count))) * 100}%`, background: `linear-gradient(90deg, ${C.goldDeep}, ${C.goldLight})`, borderRadius: 999, transition: "width 1s cubic-bezier(.16,1,.3,1)" }} />
             </div>
             <div style={{ fontSize: 11, color: t.fixed ? C.green : C.muted, marginTop: 6 }}>{t.fixed ?? `Tipar: ${t.pattern}`}</div>
           </div>
