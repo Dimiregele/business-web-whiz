@@ -32,6 +32,7 @@ const C = {
 };
 
 const SALES_EMAIL = "scanvogue@gmail.com";
+const WHATSAPP_NUMBER = "40786042404";
 
 const serif = "'Cormorant Garamond', Georgia, serif";
 const sans = "'Inter', system-ui, -apple-system, Segoe UI, sans-serif";
@@ -1197,12 +1198,10 @@ export default function ScanVogueLanding() {
 
   const displayName = restaurantName.trim() || "Numele restaurantului tău";
 
-  const buyHref = useMemo(
+  const whatsappHref = useMemo(
     () =>
-      mailto(
-        `Comandă ScanVogue — ${displayName}`,
-        `Bună,\n\nVreau să pornim ScanVogue pentru: ${displayName}\n\nOraș / adresă:\nNumăr de mese:\nPersoană de contact:\nTelefon:\n\nMulțumesc!`
-      ),
+      `https://wa.me/${WHATSAPP_NUMBER}?text=` +
+      encodeURIComponent(`Bună! Sunt interesat de ScanVogue pentru ${displayName}. Putem discuta?`),
     [displayName]
   );
 
@@ -1241,8 +1240,8 @@ export default function ScanVogueLanding() {
             <a className="sv-link sv-hide-sm" href="#dovezi">Dovezi</a>
             <a className="sv-link sv-hide-sm" href="#demo">Demo</a>
             <a className="sv-link sv-hide-sm" href="#pret">Preț</a>
-            <a className="sv-btn sv-btn-primary sv-btn-sm" href={buyHref}>
-              <Ic.cart size={15} /> Cumpără
+            <a className="sv-btn sv-btn-primary sv-btn-sm" href={contactHref}>
+              <Ic.mail size={15} /> Contactează-ne
             </a>
           </nav>
         </div>
@@ -1572,7 +1571,7 @@ export default function ScanVogueLanding() {
               <div style={{ fontSize: 11, letterSpacing: ".24em", textTransform: "uppercase", color: C.gold }}>Pachet complet</div>
               <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", gap: 8, marginTop: 14 }}>
                 <span style={{ fontFamily: serif, fontSize: 62, fontWeight: 600, lineHeight: 1 }}>
-                  <Counter to={149} />
+                  <Counter to={200} />
                 </span>
                 <span style={{ fontSize: 15, color: C.muted, paddingBottom: 10 }}>lei / lună</span>
               </div>
@@ -1595,17 +1594,17 @@ export default function ScanVogueLanding() {
               </div>
 
               <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
-                <a className="sv-btn sv-btn-primary" href={buyHref} style={{ flex: "1 1 190px" }}>
-                  <Ic.cart /> Cumpără
-                </a>
-                <a className="sv-btn sv-btn-ghost" href={contactHref} style={{ flex: "1 1 190px" }}>
+                <a className="sv-btn sv-btn-primary" href={contactHref} style={{ flex: "1 1 190px" }}>
                   <Ic.mail /> Contactează-ne
+                </a>
+                <a className="sv-btn sv-btn-ghost" href={whatsappHref} target="_blank" rel="noopener noreferrer" style={{ flex: "1 1 190px" }}>
+                  <Ic.msg /> WhatsApp 0786 042 404
                 </a>
               </div>
               <p style={{ fontSize: 11.5, color: "#6E6759", margin: "16px 0 0" }}>
-                Ambele butoane deschid un email către{" "}
+                Butonul deschide un email către{" "}
                 <a href={`mailto:${SALES_EMAIL}`} style={{ color: C.gold, textDecoration: "none" }}>{SALES_EMAIL}</a>, cu
-                mesajul deja pregătit.
+                mesajul deja pregătit. Preferi WhatsApp? Scrie-ne la 0786 042 404.
               </p>
             </div>
           </Corners>
@@ -1650,8 +1649,8 @@ export default function ScanVogueLanding() {
               Pornim {displayName} în 24 de ore. Scrie-ne și îți trimitem QR-urile.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "center", marginTop: 30 }}>
-              <a className="sv-btn sv-btn-primary" href={buyHref}><Ic.cart /> Cumpără</a>
-              <a className="sv-btn sv-btn-ghost" href={contactHref}><Ic.mail /> Contactează-ne</a>
+              <a className="sv-btn sv-btn-primary" href={contactHref}><Ic.mail /> Contactează-ne</a>
+              <a className="sv-btn sv-btn-ghost" href={whatsappHref} target="_blank" rel="noopener noreferrer"><Ic.msg /> WhatsApp 0786 042 404</a>
             </div>
           </div>
         </div>
