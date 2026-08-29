@@ -557,7 +557,7 @@ function ManagerDemo({ restaurantName }: { restaurantName: string }) {
           {SCAN_SERIES.map((s, i) => {
             const h = ((s.pos + s.neg) / maxBar) * 100;
             return (
-              <div key={s.d} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 7 }}>
+              <div key={s.d} style={{ flex: 1, height: "100%", display: "flex", flexDirection: "column", justifyContent: "flex-end", alignItems: "center", gap: 7 }}>
                 <div className="sv-bar" style={{ width: "100%", height: `${h}%`, display: "flex", flexDirection: "column", justifyContent: "flex-end", animationDelay: `${i * 0.07}s` }} title={`${s.pos} Google · ${s.neg} private`}>
                   <div style={{ height: `${(s.neg / (s.pos + s.neg)) * 100}%`, background: C.amber, borderRadius: "4px 4px 0 0", opacity: 0.85 }} />
                   <div style={{ height: `${(s.pos / (s.pos + s.neg)) * 100}%`, background: `linear-gradient(180deg, ${C.green}, rgba(143,211,160,.35))`, borderRadius: "0 0 4px 4px" }} />
