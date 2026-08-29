@@ -740,7 +740,7 @@ function StackedBars({
       </div>
       <div style={{ display: "flex", gap: 3, marginTop: 7 }}>
         {data.map((d, i) => (
-          <div key={d.label + i} style={{ flex: 1, textAlign: "center", fontSize: 9.5, color: C.muted, whiteSpace: "nowrap", overflow: "hidden" }}>
+          <div key={d.label + i} style={{ flex: 1, textAlign: "center", fontSize: 9.5, color: C.muted, whiteSpace: "nowrap", overflow: "visible" }}>
             {i % labelEvery === 0 ? d.label : ""}
           </div>
         ))}
