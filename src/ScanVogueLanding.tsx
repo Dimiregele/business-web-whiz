@@ -280,139 +280,230 @@ const mailto = (subject: string, body: string) =>
   `mailto:${SALES_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
 /* ------------------------------------------------------------------ */
-/* DEMO 1 — pagina clientului (replica funcțională a paginii de scan)   */
+/* DEMO 1 — pagina clientului (replică 1:1 a paginii reale /r/[slug])  */
 /* ------------------------------------------------------------------ */
 
-type DemoView = "initial" | "negative" | "thanks" | "redirect";
+type DemoView = "initial" | "negative-form" | "thanks-negative" | "redirecting";
+
+function ChoiceButton({
+  onClick,
+  icon,
+  children,
+  arrow,
+}: {
+  onClick?: () => void;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+  arrow?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="sv-btn"
+      style={{
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 10,
+        background: "rgba(198,161,91,0.07)",
+        color: C.text,
+        fontWeight: 600,
+        fontSize: 15,
+        borderRadius: 14,
+        padding: "16px 20px",
+        border: "1px solid rgba(198,161,91,0.35)",
+      }}
+    >
+      <span style={{ color: C.gold, display: "flex", flexShrink: 0 }}>{icon}</span>
+      <span>{children}</span>
+      {arrow && <span style={{ color: C.gold, display: "flex", flexShrink: 0 }}><Ic.arrow size={15} /></span>}
+    </button>
+  );
+}
 
 function ClientDemo({ restaurantName }: { restaurantName: string }) {
   const [view, setView] = useState<DemoView>("initial");
-  const [msg, setMsg] = useState("");
-  const [name, setName] = useState("");
-  const [contact, setContact] = useState("");
-  const [sending, setSending] = useState(false);
+  const [message, setMessage] = useState("");
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const reset = () => {
     setView("initial");
-    setMsg("");
-    setName("");
-    setContact("");
+    setMessage("");
+    setContactName("");
+    setContactEmail("");
   };
 
-  const send = () => {
-    if (!msg.trim()) return;
-    setSending(true);
+  const handleSubmitComplaint = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim()) return;
+    setSubmitting(true);
     setTimeout(() => {
-      setSending(false);
-      setView("thanks");
+      setSubmitting(false);
+      setView("thanks-negative");
     }, 900);
   };
 
-  const goGoogle = () => {
-    setView("redirect");
-    setTimeout(() => setView("initial"), 2600);
+  const handlePositive = () => {
+    setView("redirecting");
+    setTimeout(() => reset(), 2600);
   };
 
   return (
     <div className="sv-phone">
-      <div className="sv-phone-screen">
-        {/* bokeh */}
+      <div className="sv-phone-screen" style={{ justifyContent: "center" }}>
+        {/* bokeh — identic cu pagina reală */}
         <div style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden" }}>
-          <div style={{ position: "absolute", top: "-10%", left: "-14%", width: 220, height: 220, borderRadius: "50%", filter: "blur(20px)", background: "radial-gradient(circle, rgba(198,161,91,.18) 0%, transparent 70%)", animation: "sv-float1 9s ease-in-out infinite" }} />
-          <div style={{ position: "absolute", bottom: "-12%", right: "-12%", width: 250, height: 250, borderRadius: "50%", filter: "blur(20px)", background: "radial-gradient(circle, rgba(150,100,50,.16) 0%, transparent 70%)", animation: "sv-float2 11s ease-in-out infinite" }} />
+          <div style={{ position: "absolute", top: "-8%", left: "-10%", width: 260, height: 260, borderRadius: "50%", filter: "blur(20px)", background: "radial-gradient(circle, rgba(198,161,91,0.16) 0%, transparent 70%)", animation: "sv-float1 9s ease-in-out infinite" }} />
+          <div style={{ position: "absolute", bottom: "-12%", right: "-8%", width: 300, height: 300, borderRadius: "50%", filter: "blur(20px)", background: "radial-gradient(circle, rgba(150,100,50,0.14) 0%, transparent 70%)", animation: "sv-float2 11s ease-in-out infinite" }} />
+          <div style={{ position: "absolute", top: "35%", right: "-15%", width: 200, height: 200, borderRadius: "50%", filter: "blur(20px)", background: "radial-gradient(circle, rgba(198,161,91,0.1) 0%, transparent 70%)", animation: "sv-float1 8s ease-in-out infinite" }} />
         </div>
 
-        <div style={{ position: "relative", flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-          {/* wordmark */}
-          <div style={{ textAlign: "center", marginBottom: 30 }}>
-            <div style={{ fontFamily: serif, fontSize: 26, letterSpacing: ".13em", fontWeight: 600 }}>{restaurantName}</div>
-            <div style={{ fontSize: 9.5, letterSpacing: ".28em", color: C.muted, marginTop: 6, textTransform: "uppercase" }}>Bine ai venit</div>
-          </div>
-
-          {view === "initial" && (
-            <div key="initial" style={{ animation: "sv-fadeUp .5s cubic-bezier(.16,1,.3,1) both" }}>
-              <Corners>
-                <div style={{ border: `1px solid ${C.border}`, borderRadius: 18, padding: "22px 18px", background: "rgba(22,19,15,.6)" }}>
-                  <div style={{ display: "flex", justifyContent: "center", gap: 5, marginBottom: 14 }}>
-                    {[0, 1, 2, 3, 4].map((i) => (
-                      <span key={i} style={{ animation: `sv-fadeUp .5s cubic-bezier(.16,1,.3,1) ${0.05 * i}s both` }}>
-                        <Ic.star size={17} fill={C.gold} color={C.gold} />
-                      </span>
-                    ))}
-                  </div>
-                  <p style={{ textAlign: "center", fontSize: 14.5, lineHeight: 1.6, color: C.text, margin: "0 0 20px" }}>
-                    Cum a fost experiența ta astăzi?
-                  </p>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                    <button className="sv-btn sv-btn-ghost" style={{ width: "100%" }} onClick={goGoogle}>
-                      <Ic.star size={16} fill={C.gold} color={C.gold} /> Lasă o recenzie pe Google <Ic.arrow size={14} />
-                    </button>
-                    <button className="sv-btn sv-btn-ghost" style={{ width: "100%" }} onClick={() => setView("negative")}>
-                      <Ic.msg size={16} /> Trimite un mesaj privat
-                    </button>
-                  </div>
-                  <p style={{ fontSize: 10.5, color: C.muted, textAlign: "center", margin: "16px 0 0", lineHeight: 1.6 }}>
-                    Ambele opțiuni au aceeași greutate vizuală — fără „review gating”, conform politicii Google.
-                  </p>
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <Corners>
+            <div
+              style={{
+                background: C.card,
+                backdropFilter: "blur(18px)",
+                border: `1px solid ${C.border}`,
+                borderRadius: 22,
+                padding: "34px 22px",
+                boxShadow: "0 30px 60px -15px rgba(0,0,0,0.6)",
+              }}
+            >
+              {/* wordmark */}
+              <div style={{ textAlign: "center", marginBottom: 34, animation: "sv-fadeUp .55s cubic-bezier(.16,1,.3,1) .05s both" }}>
+                <div style={{ fontFamily: serif, fontSize: 28, letterSpacing: "0.14em", color: C.text, fontWeight: 600 }}>
+                  {restaurantName}
                 </div>
-              </Corners>
-            </div>
-          )}
-
-          {view === "negative" && (
-            <div key="neg" style={{ animation: "sv-fadeUp .5s cubic-bezier(.16,1,.3,1) both" }}>
-              <div style={{ border: `1px solid ${C.border}`, borderRadius: 18, padding: 18, background: "rgba(22,19,15,.6)" }}>
-                <p style={{ fontSize: 13.5, color: C.text, margin: "0 0 4px", fontWeight: 600 }}>Spune-ne ce n-a mers</p>
-                <p style={{ fontSize: 11.5, color: C.muted, margin: "0 0 14px", lineHeight: 1.6 }}>
-                  Mesajul ajunge direct la manager, în privat. Nu apare public nicăieri.
-                </p>
-                <textarea className="sv-input" rows={4} placeholder="Ex.: am așteptat 35 de minute la desert..." value={msg} onChange={(e) => setMsg(e.target.value)} style={{ resize: "none", marginBottom: 10 }} />
-                <input className="sv-input" placeholder="Nume (opțional)" value={name} onChange={(e) => setName(e.target.value)} style={{ marginBottom: 10 }} />
-                <input className="sv-input" placeholder="Telefon sau email (opțional)" value={contact} onChange={(e) => setContact(e.target.value)} style={{ marginBottom: 14 }} />
-                <button className="sv-btn sv-btn-primary" style={{ width: "100%", opacity: msg.trim() ? 1 : 0.45 }} onClick={send} disabled={!msg.trim() || sending}>
-                  {sending ? (
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#100F0D" strokeWidth="2.2" strokeLinecap="round" style={{ animation: "sv-spin 1s linear infinite" }}>
-                      <path d="M21 12a9 9 0 11-6.2-8.6" />
-                    </svg>
-                  ) : (
-                    <Ic.send />
-                  )}
-                  {sending ? "Se trimite..." : "Trimite mesajul"}
-                </button>
-                <button className="sv-link" style={{ background: "none", border: "none", width: "100%", marginTop: 12, cursor: "pointer" }} onClick={reset}>
-                  Înapoi
-                </button>
+                <div style={{ fontSize: 10.5, letterSpacing: "0.28em", color: C.muted, marginTop: 6, textTransform: "uppercase" }}>
+                  Restaurant
+                </div>
               </div>
-            </div>
-          )}
 
-          {view === "thanks" && (
-            <div key="thanks" style={{ animation: "sv-fadeUp .5s cubic-bezier(.16,1,.3,1) both", textAlign: "center" }}>
-              <svg width="52" height="52" viewBox="0 0 52 52" style={{ margin: "0 auto 16px", display: "block" }}>
-                <circle cx="26" cy="26" r="20" fill="none" stroke={C.gold} strokeWidth="1.5" strokeDasharray="126" style={{ animation: "sv-drawCircle .7s cubic-bezier(.16,1,.3,1) both" }} />
-                <path d="M16 27l7 7 13-15" fill="none" stroke={C.gold} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="36" style={{ animation: "sv-drawCheck .4s ease .6s both" }} />
-              </svg>
-              <p style={{ fontFamily: serif, fontSize: 22, margin: 0 }}>Mulțumim.</p>
-              <p style={{ fontSize: 12.5, color: C.muted, lineHeight: 1.7, margin: "10px 0 18px" }}>
-                Managerul a primit deja o alertă pe email, cu rezumat AI și un draft de răspuns.
-              </p>
-              <button className="sv-btn sv-btn-ghost sv-btn-sm" onClick={reset}>Reia demo-ul</button>
-            </div>
-          )}
+              {view === "initial" && (
+                <div>
+                  <p style={{ textAlign: "center", color: C.muted, fontSize: 14, lineHeight: 1.5, marginBottom: 26, animation: "sv-fadeUp .55s cubic-bezier(.16,1,.3,1) .15s both" }}>
+                    Spune-ne cum a fost — alege ce ți se potrivește.
+                  </p>
 
-          {view === "redirect" && (
-            <div key="redir" style={{ animation: "sv-fadeUp .4s ease both", textAlign: "center" }}>
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke={C.gold} strokeWidth="2" strokeLinecap="round" style={{ animation: "sv-spin 1s linear infinite", margin: "0 auto 14px", display: "block" }}>
-                <path d="M21 12a9 9 0 11-6.2-8.6" />
-              </svg>
-              <p style={{ fontSize: 13.5, color: C.text, margin: 0 }}>Te ducem pe pagina Google...</p>
-              <p style={{ fontSize: 11.5, color: C.muted, margin: "8px 0 0" }}>(în demo nu se face redirect real)</p>
-            </div>
-          )}
-        </div>
+                  <div style={{ animation: "sv-fadeUp .55s cubic-bezier(.16,1,.3,1) .25s both" }}>
+                    <ChoiceButton onClick={handlePositive} icon={<Ic.star size={17} />} arrow>
+                      Lasă o recenzie pe Google
+                    </ChoiceButton>
+                  </div>
 
-        <div style={{ position: "relative", textAlign: "center", fontSize: 9.5, letterSpacing: ".22em", color: "#5F594D", textTransform: "uppercase", marginTop: 18 }}>
-          powered by ScanVogue
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "18px 0", animation: "sv-fadeUp .55s cubic-bezier(.16,1,.3,1) .25s both" }}>
+                    <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
+                    <span style={{ fontSize: 11, letterSpacing: "0.14em", color: C.muted, textTransform: "uppercase" }}>sau</span>
+                    <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
+                  </div>
+
+                  <div style={{ animation: "sv-fadeUp .55s cubic-bezier(.16,1,.3,1) .35s both" }}>
+                    <p style={{ textAlign: "center", color: C.muted, fontSize: 12.5, marginBottom: 10, lineHeight: 1.5 }}>
+                      Ai avut o problemă și vrei să o rezolvăm imediat?
+                    </p>
+                    <ChoiceButton onClick={() => setView("negative-form")} icon={<Ic.msg size={17} />}>
+                      Trimite un mesaj privat conducerii
+                    </ChoiceButton>
+                  </div>
+                </div>
+              )}
+
+              {view === "negative-form" && (
+                <form onSubmit={handleSubmitComplaint}>
+                  <p style={{ textAlign: "center", color: C.text, fontSize: 16, marginBottom: 4, fontWeight: 500, animation: "sv-fadeUp .55s cubic-bezier(.16,1,.3,1) .05s both" }}>
+                    Ne pare rău să auzim asta.
+                  </p>
+                  <p style={{ textAlign: "center", color: C.muted, fontSize: 13.5, marginBottom: 26, lineHeight: 1.5, animation: "sv-fadeUp .55s cubic-bezier(.16,1,.3,1) .05s both" }}>
+                    Spune-ne ce nu a fost în regulă — mesajul ajunge direct la echipa noastră.
+                  </p>
+
+                  <textarea
+                    required
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Ce nu a fost pe placul tău?"
+                    rows={4}
+                    className="sv-input"
+                    style={{ marginBottom: 18, resize: "none" }}
+                  />
+
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+                    <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
+                    <span style={{ fontSize: 10.5, letterSpacing: "0.18em", color: C.gold, textTransform: "uppercase", whiteSpace: "nowrap" }}>
+                      Ca să primești un răspuns
+                    </span>
+                    <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
+                  </div>
+                  <p style={{ textAlign: "center", color: C.muted, fontSize: 12.5, marginBottom: 14, lineHeight: 1.5 }}>
+                    Lasă-ne un contact ca să te putem suna sau scrie personal și să îndreptăm lucrurile.
+                  </p>
+
+                  <input
+                    value={contactName}
+                    onChange={(e) => setContactName(e.target.value)}
+                    placeholder="Nume"
+                    className="sv-input"
+                    style={{ marginBottom: 10 }}
+                  />
+                  <input
+                    type="email"
+                    value={contactEmail}
+                    onChange={(e) => setContactEmail(e.target.value)}
+                    placeholder="Email — primești răspunsul nostru aici"
+                    className="sv-input"
+                    style={{ marginBottom: 20 }}
+                  />
+
+                  <button type="submit" className="sv-btn sv-btn-primary" style={{ width: "100%" }} disabled={submitting}>
+                    {submitting ? (
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#100F0D" strokeWidth="2.2" strokeLinecap="round" style={{ animation: "sv-spin .8s linear infinite" }}>
+                        <path d="M21 12a9 9 0 11-6.2-8.6" />
+                      </svg>
+                    ) : (
+                      <Ic.send size={15} />
+                    )}
+                    {submitting ? "Se trimite..." : "Trimite"}
+                  </button>
+                  <p style={{ textAlign: "center", color: C.muted, fontSize: 11, marginTop: 14, lineHeight: 1.5 }}>
+                    Prin trimitere ești de acord cu prelucrarea datelor conform{" "}
+                    <span style={{ textDecoration: "underline" }}>Politicii de Confidențialitate</span>.
+                  </p>
+                  <button type="button" className="sv-link" style={{ background: "none", border: "none", width: "100%", marginTop: 10, cursor: "pointer" }} onClick={reset}>
+                    Înapoi
+                  </button>
+                </form>
+              )}
+
+              {view === "thanks-negative" && (
+                <div style={{ textAlign: "center", padding: "8px 0" }}>
+                  <svg width="52" height="52" viewBox="0 0 52 52" style={{ margin: "0 auto 18px", display: "block" }}>
+                    <circle cx="26" cy="26" r="20" fill="none" stroke={C.gold} strokeWidth="1.5" strokeDasharray="126" style={{ animation: "sv-drawCircle .7s cubic-bezier(.16,1,.3,1) both" }} />
+                    <path d="M16 27l7 7 13-15" fill="none" stroke={C.gold} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="36" style={{ animation: "sv-drawCheck .4s ease .6s both" }} />
+                  </svg>
+                  <p style={{ color: C.text, fontSize: 16, marginBottom: 8, fontWeight: 500 }}>
+                    Mulțumim, mesajul tău a ajuns la echipa noastră!
+                  </p>
+                  <p style={{ color: C.muted, fontSize: 13.5, lineHeight: 1.5 }}>
+                    Dacă ai lăsat un contact, cineva din echipă îți va răspunde personal în cel mai scurt timp.
+                  </p>
+                  <button className="sv-btn sv-btn-ghost sv-btn-sm" style={{ marginTop: 18 }} onClick={reset}>Reia demo-ul</button>
+                </div>
+              )}
+
+              {view === "redirecting" && (
+                <div style={{ textAlign: "center", padding: "20px 0" }}>
+                  <div style={{ width: 40, height: 40, margin: "0 auto 20px", borderRadius: "50%", border: "2px solid rgba(198,161,91,0.2)", borderTopColor: C.gold, animation: "sv-spin .9s linear infinite" }} />
+                  <p style={{ color: C.text, fontSize: 15.5 }}>Mulțumim! Te ducem spre Google Reviews...</p>
+                  <p style={{ fontSize: 11.5, color: C.muted, margin: "8px 0 0" }}>(în demo nu se face redirect real)</p>
+                </div>
+              )}
+            </div>
+          </Corners>
         </div>
       </div>
     </div>
@@ -420,227 +511,666 @@ function ClientDemo({ restaurantName }: { restaurantName: string }) {
 }
 
 /* ------------------------------------------------------------------ */
-/* DEMO 2 — panoul de manager                                          */
+/* DEMO 2 — panoul de manager (replică 1:1 a panoului real)            */
 /* ------------------------------------------------------------------ */
 
+type ComplaintStatus = "new" | "read" | "resolved";
+
 type Complaint = {
-  id: number;
-  when: string;
-  text: string;
-  contact: string;
-  summary: string;
-  reply: string;
-  tag: string;
-  status: "new" | "progress" | "resolved";
+  id: string;
+  message: string;
+  contact_name: string | null;
+  contact_email: string | null;
+  contact_phone: string | null;
+  status: ComplaintStatus;
+  created_at: string;
+  ai_summary: string | null;
+  ai_suggested_reply: string | null;
+  ai_sensitive: boolean;
+  reply_sent_at: string | null;
+};
+
+const dayMs = 24 * 60 * 60 * 1000;
+const daysAgo = (d: number, hour: number, minute = 0) => {
+  const t = new Date(Date.now() - d * dayMs);
+  t.setHours(hour, minute, 0, 0);
+  return t.toISOString();
 };
 
 const SEED_COMPLAINTS: Complaint[] = [
   {
-    id: 1,
-    when: "azi, 21:14",
-    text: "Am rezervat pentru 20:30 și am primit masa la 21:05. Nimeni nu ne-a spus nimic între timp.",
-    contact: "Andrei M. · 07xx xxx 214",
-    summary: "Întârziere de 35 min la o rezervare confirmată, fără comunicare din partea gazdei.",
-    reply:
+    id: "c1",
+    message: "Am rezervat pentru 20:30 și am primit masa la 21:05. Nimeni nu ne-a spus nimic între timp.",
+    contact_name: "Andrei M.",
+    contact_email: "andrei.m@email.com",
+    contact_phone: "07xx xxx 214",
+    status: "new",
+    created_at: daysAgo(0, 21, 14),
+    ai_summary: "Întârziere de 35 min la o rezervare confirmată, fără comunicare din partea gazdei.",
+    ai_suggested_reply:
       "Bună, Andrei. Ai avut dreptate să fii nemulțumit — o rezervare confirmată înseamnă o masă la ora stabilită. Am revizuit deja modul în care ținem rezervările în intervalul 20:00–21:30. Ne-ar face plăcere să te avem înapoi, cu desertul din partea casei.",
-    tag: "Timp de așteptare",
-    status: "new",
+    ai_sensitive: false,
+    reply_sent_at: null,
   },
   {
-    id: 2,
-    when: "ieri, 20:02",
-    text: "Ciorba a venit călduță, iar când am semnalat, chelnerul a ridicat din umeri.",
-    contact: "fără contact",
-    summary: "Preparat servit la temperatură scăzută + reacție defensivă a personalului de sală.",
-    reply:
+    id: "c2",
+    message: "Ciorba a venit călduță, iar când am semnalat, chelnerul a ridicat din umeri.",
+    contact_name: null,
+    contact_email: null,
+    contact_phone: null,
+    status: "new",
+    created_at: daysAgo(1, 20, 2),
+    ai_summary: "Preparat servit la temperatură scăzută + reacție defensivă a personalului de sală.",
+    ai_suggested_reply:
       "Vă mulțumim că ne-ați spus. Temperatura la servire și modul în care reacționăm când ceva nu e în regulă sunt două lucruri pe care le-am discutat azi cu echipa de sală. Ne-ar plăcea să reparăm impresia la o următoare vizită.",
-    tag: "Temperatura preparatelor",
-    status: "new",
+    ai_sensitive: false,
+    reply_sent_at: null,
   },
   {
-    id: 3,
-    when: "vineri, 22:41",
-    text: "Muzica era atât de tare încât nu ne auzeam la masă. Am plecat fără desert.",
-    contact: "Ioana P. · ioana@…",
-    summary: "Volum ambiental prea ridicat după ora 22:00; a scurtat durata mesei și consumul.",
-    reply:
-      "Bună, Ioana. Am măsurat volumul în sală vineri seara și l-am coborât cu 6 dB după ora 22:00. Mulțumim că ne-ai scris în loc să pleci în tăcere — exact asta ne ajută să reparăm lucrurile.",
-    tag: "Zgomot / ambient",
-    status: "progress",
+    id: "c3",
+    message: "Am găsit un fir de păr în farfurie și zona de lângă bar mi s-a părut murdară.",
+    contact_name: "Ioana P.",
+    contact_email: "ioana.p@email.com",
+    contact_phone: null,
+    status: "read",
+    created_at: daysAgo(3, 22, 41),
+    ai_summary: "Sesizare de igienă: corp străin în preparat și curățenie deficitară în zona barului.",
+    ai_suggested_reply:
+      "Bună, Ioana. Am tratat mesajul tău ca pe o urgență: am verificat azi-dimineață fluxul din bucătărie și programul de curățenie din zona barului. Îmi pare sincer rău pentru experiență și te-aș ruga să ne dai ocazia să reparăm lucrurile.",
+    ai_sensitive: true,
+    reply_sent_at: null,
+  },
+  {
+    id: "c4",
+    message: "Muzica era atât de tare încât nu ne auzeam la masă. Am plecat fără desert.",
+    contact_name: "Radu T.",
+    contact_email: "radu.t@email.com",
+    contact_phone: null,
+    status: "read",
+    created_at: daysAgo(5, 22, 10),
+    ai_summary: "Volum ambiental prea ridicat după ora 22:00; a scurtat durata mesei și consumul.",
+    ai_suggested_reply:
+      "Bună, Radu. Am măsurat volumul în sală vineri seara și l-am coborât cu 6 dB după ora 22:00. Mulțumim că ne-ai scris în loc să pleci în tăcere — exact asta ne ajută să reparăm lucrurile.",
+    ai_sensitive: false,
+    reply_sent_at: daysAgo(4, 11, 30),
+  },
+  {
+    id: "c5",
+    message: "Nota a venit greșit, cu un fel în plus. S-a rezolvat, dar a durat.",
+    contact_name: null,
+    contact_email: null,
+    contact_phone: null,
+    status: "resolved",
+    created_at: daysAgo(9, 21, 5),
+    ai_summary: "Eroare de facturare, corectată la fața locului, dar cu timp de așteptare.",
+    ai_suggested_reply: null,
+    ai_sensitive: false,
+    reply_sent_at: null,
   },
 ];
 
-const SCAN_SERIES = [
-  { d: "Lu", pos: 18, neg: 3 },
-  { d: "Ma", pos: 22, neg: 2 },
-  { d: "Mi", pos: 26, neg: 4 },
-  { d: "Jo", pos: 31, neg: 3 },
-  { d: "Vi", pos: 47, neg: 6 },
-  { d: "Sâ", pos: 58, neg: 5 },
-  { d: "Du", pos: 39, neg: 2 },
+type ThemeRowData = { theme: string; count: number; timePattern: string | null; outcome: string | null };
+
+const SEED_THEMES: ThemeRowData[] = [
+  { theme: "Timp de așteptare la masă", count: 14, timePattern: "Mai ales vineri și sâmbătă, 20:00–21:30", outcome: null },
+  { theme: "Temperatura preparatelor", count: 9, timePattern: "Fără tipar clar de oră", outcome: null },
+  { theme: "Zgomot / muzică prea tare", count: 6, timePattern: "După ora 22:00", outcome: "Marcat rezolvat pe 12 iunie — de atunci 0 reclamații pe această temă." },
+  { theme: "Atitudinea personalului de sală", count: 4, timePattern: "Serile de weekend", outcome: null },
 ];
 
-const THEMES = [
-  { theme: "Timp de așteptare la masă", count: 14, pattern: "vineri & sâmbătă, 20:00–21:30", fixed: null as string | null },
-  { theme: "Temperatura preparatelor", count: 9, pattern: "prânz, 12:30–14:00", fixed: null },
-  { theme: "Zgomot în sala mare", count: 6, pattern: "după 22:00", fixed: "Remediat pe 12 aug — 0 reclamații noi în 3 săptămâni" },
-];
+type Granularity = "day" | "week" | "month" | "year";
+const GRANULARITY_LABEL: Record<Granularity, string> = { day: "Zi", week: "Săptămână", month: "Lună", year: "An" };
+const WINDOW_SIZE: Record<Granularity, number> = { day: 30, week: 12, month: 12, year: 6 };
+const pad = (n: number) => n.toString().padStart(2, "0");
 
-function ManagerDemo({ restaurantName }: { restaurantName: string }) {
-  const [complaints, setComplaints] = useState(SEED_COMPLAINTS);
-  const [open, setOpen] = useState<number | null>(1);
-  const [copied, setCopied] = useState<number | null>(null);
+type Scan = { created_at: string; choice: "positive" | "negative" | null };
 
-  const setStatus = (id: number, status: Complaint["status"]) =>
-    setComplaints((cs) => cs.map((c) => (c.id === id ? { ...c, status } : c)));
-
-  const totalScans = SCAN_SERIES.reduce((a, b) => a + b.pos + b.neg, 0);
-  const negTotal = SCAN_SERIES.reduce((a, b) => a + b.neg, 0);
-  const satisfaction = Math.round(((totalScans - negTotal) / totalScans) * 100);
-  const maxBar = Math.max(...SCAN_SERIES.map((s) => s.pos + s.neg));
-  const openCount = complaints.filter((c) => c.status !== "resolved").length;
-
-  const copyReply = async (c: Complaint) => {
-    try {
-      await navigator.clipboard.writeText(c.reply);
-    } catch {
-      /* clipboard indisponibil în unele iframe-uri — demo-ul continuă */
-    }
-    setCopied(c.id);
-    setTimeout(() => setCopied(null), 1800);
+/* set de scanări demo, deterministic — imită traficul unui restaurant */
+function buildDemoScans(): Scan[] {
+  const out: Scan[] = [];
+  let seed = 42;
+  const rnd = () => {
+    seed = (seed * 1103515245 + 12345) % 2147483648;
+    return seed / 2147483648;
   };
+  const hourWeights = [0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 3, 5, 9, 10, 6, 4, 4, 6, 10, 14, 16, 12, 6, 2];
+  for (let d = 89; d >= 0; d--) {
+    const date = new Date(Date.now() - d * dayMs);
+    const dow = date.getDay();
+    const weekendBoost = dow === 5 || dow === 6 ? 1.6 : dow === 0 ? 1.15 : 1;
+    const growth = 1 + (89 - d) / 150;
+    const count = Math.round((5 + rnd() * 5) * weekendBoost * growth);
+    for (let i = 0; i < count; i++) {
+      let pick = rnd() * hourWeights.reduce((a, b) => a + b, 0);
+      let hour = 12;
+      for (let h = 0; h < 24; h++) {
+        pick -= hourWeights[h] ?? 0;
+        if (pick <= 0) { hour = h; break; }
+      }
+      const r = rnd();
+      const choice: Scan["choice"] = r < 0.82 ? "positive" : r < 0.94 ? "negative" : null;
+      const t = new Date(date);
+      t.setHours(hour, Math.floor(rnd() * 60), 0, 0);
+      out.push({ created_at: t.toISOString(), choice });
+    }
+  }
+  return out;
+}
 
-  const statusLabel: Record<Complaint["status"], string> = { new: "Nouă", progress: "În lucru", resolved: "Rezolvată" };
-  const statusColor: Record<Complaint["status"], string> = { new: C.amber, progress: C.gold, resolved: C.green };
+function startOfWeek(d: Date) {
+  const monday = new Date(d);
+  monday.setHours(0, 0, 0, 0);
+  const day = monday.getDay();
+  monday.setDate(monday.getDate() + ((day === 0 ? -6 : 1) - day));
+  return monday;
+}
 
+function bucketKeyAndLabel(date: Date, granularity: Granularity): { key: string; label: string } {
+  if (granularity === "day") {
+    return { key: `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`, label: `${pad(date.getDate())}.${pad(date.getMonth() + 1)}` };
+  }
+  if (granularity === "week") {
+    const monday = startOfWeek(date);
+    return { key: `${monday.getFullYear()}-${pad(monday.getMonth() + 1)}-${pad(monday.getDate())}`, label: `${pad(monday.getDate())}.${pad(monday.getMonth() + 1)}` };
+  }
+  if (granularity === "month") {
+    return { key: `${date.getFullYear()}-${pad(date.getMonth() + 1)}`, label: date.toLocaleDateString("ro-RO", { month: "short", year: "2-digit" }) };
+  }
+  const key = `${date.getFullYear()}`;
+  return { key, label: key };
+}
+
+function emptyBuckets(granularity: Granularity, count: number) {
+  const now = new Date();
+  const out: { key: string; label: string }[] = [];
+  for (let i = count - 1; i >= 0; i--) {
+    const d = new Date(now);
+    if (granularity === "day") d.setDate(d.getDate() - i);
+    else if (granularity === "week") d.setDate(d.getDate() - i * 7);
+    else if (granularity === "month") d.setMonth(d.getMonth() - i);
+    else d.setFullYear(d.getFullYear() - i);
+    out.push(bucketKeyAndLabel(d, granularity));
+  }
+  const seen = new Set<string>();
+  return out.filter((b) => (seen.has(b.key) ? false : (seen.add(b.key), true)));
+}
+
+const adminCard: React.CSSProperties = {
+  background: C.card,
+  border: `1px solid ${C.border}`,
+  borderRadius: 18,
+  padding: 22,
+};
+const adminTitle: React.CSSProperties = { color: C.text, fontSize: 15, fontWeight: 600, marginTop: 0, marginBottom: 16 };
+const smallPill: React.CSSProperties = {
+  fontSize: 12,
+  padding: "6px 14px",
+  borderRadius: 999,
+  border: "1px solid rgba(198,161,91,0.35)",
+  background: "transparent",
+  color: C.goldLight,
+  cursor: "pointer",
+  fontFamily: sans,
+  whiteSpace: "nowrap",
+};
+const ghostPill: React.CSSProperties = { ...smallPill, border: "1px solid rgba(255,255,255,0.1)", color: C.muted };
+
+function StackedBars({
+  data,
+  height,
+  labelEvery = 1,
+}: {
+  data: { label: string; positive: number; negative: number; total: number }[];
+  height: number;
+  labelEvery?: number;
+}) {
+  const max = Math.max(1, ...data.map((d) => d.total));
   return (
-    <div className="sv-card" style={{ padding: 20, background: "rgba(16,14,11,.9)" }}>
-      {/* header */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
-        <div>
-          <div style={{ fontFamily: serif, fontSize: 20, letterSpacing: ".06em" }}>{restaurantName}</div>
-          <div style={{ fontSize: 10.5, letterSpacing: ".24em", color: C.muted, textTransform: "uppercase", marginTop: 4 }}>Panou manager</div>
-        </div>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <span style={{ fontSize: 11.5, color: C.muted }}>Ultimele 7 zile</span>
-          <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11.5, color: C.green, border: `1px solid rgba(143,211,160,.28)`, borderRadius: 999, padding: "5px 11px" }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.green, animation: "sv-pulse 2.4s infinite" }} /> live
-          </span>
-        </div>
-      </div>
-
-      {/* KPI */}
-      <div className="sv-grid-3" style={{ gap: 12, marginBottom: 16 }}>
-        {[
-          { l: "Scanări", v: <Counter to={totalScans} />, s: "+38% vs. săpt. trecută" },
-          { l: "Satisfacție", v: <Counter to={satisfaction} suffix="%" />, s: `${negTotal} mesaje private` },
-          { l: "Reclamații deschise", v: <Counter to={openCount} />, s: "medie răspuns: 3h 12m" },
-        ].map((k) => (
-          <div key={k.l} className="sv-lift" style={{ border: `1px solid ${C.border2}`, borderRadius: 14, padding: 14, background: "rgba(255,255,255,.02)" }}>
-            <div style={{ fontSize: 10.5, letterSpacing: ".2em", textTransform: "uppercase", color: C.muted }}>{k.l}</div>
-            <div style={{ fontFamily: serif, fontSize: 34, fontWeight: 600, marginTop: 6, color: C.text }}>{k.v}</div>
-            <div style={{ fontSize: 11.5, color: C.muted, marginTop: 2 }}>{k.s}</div>
+    <div>
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 3, height }}>
+        {data.map((d, i) => (
+          <div key={d.label + i} style={{ flex: 1, height: "100%", display: "flex", flexDirection: "column", justifyContent: "flex-end" }} title={`${d.label}: ${d.positive} pozitive · ${d.negative} negative`}>
+            <div className="sv-bar" style={{ height: `${(d.total / max) * 100}%`, display: "flex", flexDirection: "column", justifyContent: "flex-end", animationDelay: `${Math.min(i * 0.02, 0.6)}s` }}>
+              <div style={{ height: `${d.total ? (d.negative / d.total) * 100 : 0}%`, background: C.amber, borderRadius: "3px 3px 0 0" }} />
+              <div style={{ height: `${d.total ? (d.positive / d.total) * 100 : 0}%`, background: C.green }} />
+            </div>
           </div>
         ))}
       </div>
-
-      {/* chart */}
-      <div style={{ border: `1px solid ${C.border2}`, borderRadius: 14, padding: "16px 16px 10px", marginBottom: 16, background: "rgba(255,255,255,.02)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-          <span style={{ fontSize: 12.5, fontWeight: 600 }}>Scanări pe zi</span>
-          <span style={{ display: "flex", gap: 14, fontSize: 11, color: C.muted }}>
-            <span><span style={{ display: "inline-block", width: 8, height: 8, borderRadius: 2, background: C.green, marginRight: 5 }} />Google</span>
-            <span><span style={{ display: "inline-block", width: 8, height: 8, borderRadius: 2, background: C.amber, marginRight: 5 }} />privat</span>
-          </span>
-        </div>
-        <div style={{ display: "flex", alignItems: "flex-end", gap: 10, height: 130 }}>
-          {SCAN_SERIES.map((s, i) => {
-            const h = ((s.pos + s.neg) / maxBar) * 100;
-            return (
-              <div key={s.d} style={{ flex: 1, height: "100%", display: "flex", flexDirection: "column", justifyContent: "flex-end", alignItems: "center", gap: 7 }}>
-                <div className="sv-bar" style={{ width: "100%", flex: `0 0 ${h}%`, minHeight: 4, display: "flex", flexDirection: "column", justifyContent: "flex-end", animationDelay: `${i * 0.07}s` }} title={`${s.pos} Google · ${s.neg} private`}>
-                  <div style={{ height: `${(s.neg / (s.pos + s.neg)) * 100}%`, background: C.amber, borderRadius: "4px 4px 0 0", opacity: 0.85 }} />
-                  <div style={{ height: `${(s.pos / (s.pos + s.neg)) * 100}%`, background: `linear-gradient(180deg, ${C.green}, rgba(143,211,160,.35))`, borderRadius: "0 0 4px 4px" }} />
-                </div>
-                <span style={{ fontSize: 10.5, color: C.muted }}>{s.d}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* teme recurente */}
-      <div style={{ border: `1px solid ${C.border2}`, borderRadius: 14, padding: 16, marginBottom: 16, background: "rgba(255,255,255,.02)" }}>
-        <div style={{ fontSize: 12.5, fontWeight: 600, marginBottom: 3 }}>Teme recurente (AI, ultimele 30 de zile)</div>
-        <div style={{ fontSize: 11.5, color: C.muted, marginBottom: 14 }}>Calculate automat săptămânal — nu ai nimic de apăsat.</div>
-        {THEMES.map((t, i) => (
-          <div key={t.theme} style={{ marginBottom: i === THEMES.length - 1 ? 0 : 14 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 10, fontSize: 12.5, marginBottom: 6 }}>
-              <span>{t.theme}</span>
-              <span style={{ color: C.muted, whiteSpace: "nowrap" }}>{t.count}×</span>
-            </div>
-            <div style={{ height: 5, borderRadius: 999, background: "rgba(255,255,255,.06)", overflow: "hidden" }}>
-              <div style={{ height: "100%", width: `${(t.count / Math.max(...THEMES.map((x) => x.count))) * 100}%`, background: `linear-gradient(90deg, ${C.goldDeep}, ${C.goldLight})`, borderRadius: 999, transition: "width 1s cubic-bezier(.16,1,.3,1)" }} />
-            </div>
-            <div style={{ fontSize: 11, color: t.fixed ? C.green : C.muted, marginTop: 6 }}>{t.fixed ?? `Tipar: ${t.pattern}`}</div>
+      <div style={{ display: "flex", gap: 3, marginTop: 7 }}>
+        {data.map((d, i) => (
+          <div key={d.label + i} style={{ flex: 1, textAlign: "center", fontSize: 9.5, color: C.muted, whiteSpace: "nowrap", overflow: "hidden" }}>
+            {i % labelEvery === 0 ? d.label : ""}
           </div>
         ))}
-      </div>
-
-      {/* reclamații */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {complaints.map((c) => {
-          const isOpen = open === c.id;
-          return (
-            <div key={c.id} style={{ border: `1px solid ${isOpen ? "rgba(198,161,91,.4)" : C.border2}`, borderRadius: 14, background: "rgba(255,255,255,.02)", transition: "border-color .3s ease" }}>
-              <button
-                onClick={() => setOpen(isOpen ? null : c.id)}
-                style={{ width: "100%", textAlign: "left", background: "none", border: "none", cursor: "pointer", padding: 14, color: C.text, fontFamily: sans }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center" }}>
-                  <span style={{ fontSize: 11, color: statusColor[c.status], border: `1px solid ${statusColor[c.status]}44`, borderRadius: 999, padding: "3px 9px" }}>
-                    {statusLabel[c.status]}
-                  </span>
-                  <span style={{ fontSize: 11, color: C.muted }}>{c.when}</span>
-                </div>
-                <p style={{ fontSize: 13.5, lineHeight: 1.6, margin: "10px 0 0" }}>„{c.text}”</p>
-                <div style={{ fontSize: 11, color: C.muted, marginTop: 8 }}>{c.contact} · {c.tag}</div>
-              </button>
-
-              <div style={{ maxHeight: isOpen ? 460 : 0, overflow: "hidden", transition: "max-height .5s cubic-bezier(.16,1,.3,1)" }}>
-                <div style={{ padding: "0 14px 14px" }}>
-                  <div style={{ borderTop: `1px solid ${C.border2}`, paddingTop: 12 }}>
-                    <div style={{ display: "flex", gap: 7, alignItems: "center", fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", color: C.gold, marginBottom: 7 }}>
-                      <Ic.spark size={14} /> Rezumat AI
-                    </div>
-                    <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.65, margin: 0 }}>{c.summary}</p>
-
-                    <div style={{ display: "flex", gap: 7, alignItems: "center", fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", color: C.gold, margin: "14px 0 7px" }}>
-                      <Ic.msg size={14} /> Draft de răspuns
-                    </div>
-                    <p style={{ fontSize: 13, lineHeight: 1.7, margin: 0, background: "rgba(198,161,91,.06)", border: `1px solid ${C.border}`, borderRadius: 12, padding: 12 }}>{c.reply}</p>
-
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 12 }}>
-                      <button className="sv-btn sv-btn-primary sv-btn-sm" onClick={() => copyReply(c)}>
-                        {copied === c.id ? "Copiat ✓" : "Copiază răspunsul"}
-                      </button>
-                      <button className="sv-btn sv-btn-ghost sv-btn-sm" onClick={() => setStatus(c.id, "progress")}>În lucru</button>
-                      <button className="sv-btn sv-btn-ghost sv-btn-sm" onClick={() => setStatus(c.id, "resolved")}>Marchează rezolvată</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-        {complaints.every((c) => c.status === "resolved") && (
-          <button className="sv-btn sv-btn-ghost sv-btn-sm" onClick={() => setComplaints(SEED_COMPLAINTS)}>Reia demo-ul</button>
-        )}
       </div>
     </div>
   );
 }
 
+function ThemeRow({ row }: { row: ThemeRowData }) {
+  const [formOpen, setFormOpen] = useState(false);
+  const [note, setNote] = useState("");
+  const [justMarked, setJustMarked] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const submit = () => {
+    setSaving(true);
+    setTimeout(() => {
+      setSaving(false);
+      setFormOpen(false);
+      setNote("");
+      setJustMarked(true);
+    }, 700);
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
+        <span style={{ color: C.text, fontSize: 13.5, fontWeight: 500 }}>{row.theme}</span>
+        <span style={{ color: C.gold, fontSize: 12.5, fontWeight: 600 }}>{row.count}×</span>
+      </div>
+      <div style={{ height: 5, background: "rgba(255,255,255,0.05)", borderRadius: 3, overflow: "hidden", marginBottom: 6 }}>
+        <div style={{ height: "100%", width: `${(row.count / 14) * 100}%`, background: `linear-gradient(90deg, ${C.goldDeep}, ${C.gold})`, borderRadius: 3, transition: "width 1s cubic-bezier(.16,1,.3,1)" }} />
+      </div>
+      {row.timePattern && <p style={{ color: C.gold, fontSize: 12, margin: "0 0 6px" }}>{row.timePattern}</p>}
+      {(row.outcome || justMarked) && (
+        <p style={{ color: C.muted, fontSize: 12, margin: "0 0 6px", lineHeight: 1.5 }}>
+          {justMarked && !row.outcome ? "Marcat ca rezolvat — revenim cu rezultatul în câteva zile." : row.outcome}
+        </p>
+      )}
+      {!formOpen && !justMarked && (
+        <button type="button" onClick={() => setFormOpen(true)} style={smallPill}>
+          Marchează ca rezolvat
+        </button>
+      )}
+      {formOpen && (
+        <div style={{ marginTop: 6 }}>
+          <textarea
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Ce ai făcut ca să rezolvi asta? (opțional)"
+            rows={2}
+            className="sv-input"
+            style={{ fontSize: 12.5, resize: "none" }}
+          />
+          <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+            <button type="button" onClick={() => setFormOpen(false)} disabled={saving} style={ghostPill}>Anulează</button>
+            <button type="button" onClick={submit} disabled={saving} style={smallPill}>{saving ? "Se salvează..." : "Confirmă"}</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const STATUS_LABEL: Record<ComplaintStatus, string> = { new: "Nouă", read: "Citită", resolved: "Rezolvată" };
+const STATUS_COLOR: Record<ComplaintStatus, string> = { new: C.amber, read: C.gold, resolved: C.green };
+
+function ComplaintCard({ complaint: c, onStatus }: { complaint: Complaint; onStatus: (id: string, s: ComplaintStatus) => void }) {
+  const [replyText, setReplyText] = useState(c.ai_suggested_reply ?? "");
+  const [showComposer, setShowComposer] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sentAt, setSentAt] = useState<string | null>(c.reply_sent_at);
+
+  const nextStatus: ComplaintStatus = c.status === "new" ? "read" : c.status === "read" ? "resolved" : "new";
+
+  const fmt = (iso: string) =>
+    new Date(iso).toLocaleString("ro-RO", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+
+  const send = () => {
+    setSending(true);
+    setTimeout(() => {
+      setSending(false);
+      setSentAt(new Date().toISOString());
+      setShowComposer(false);
+    }, 800);
+  };
+
+  return (
+    <div style={{ padding: 14, background: "rgba(255,255,255,0.02)", borderRadius: 12 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
+        <p style={{ color: C.text, fontSize: 14, lineHeight: 1.5, margin: 0, flex: 1 }}>{c.message}</p>
+        <button
+          type="button"
+          onClick={() => onStatus(c.id, nextStatus)}
+          title={`Apasă ca să marchezi drept „${STATUS_LABEL[nextStatus]}”`}
+          style={{
+            fontSize: 11,
+            padding: "5px 10px",
+            borderRadius: 999,
+            border: "1px solid",
+            background: "transparent",
+            cursor: "pointer",
+            fontFamily: sans,
+            color: STATUS_COLOR[c.status],
+            borderColor: STATUS_COLOR[c.status] + "59",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {STATUS_LABEL[c.status]}
+        </button>
+      </div>
+
+      <div style={{ color: C.muted, fontSize: 12, marginTop: 8 }}>
+        {fmt(c.created_at)}
+        {c.contact_name && <> · contact: {c.contact_name}</>}
+        {c.contact_phone && <> · {c.contact_phone}</>}
+        {c.contact_email && <> · {c.contact_email}</>}
+      </div>
+
+      {c.ai_sensitive && (
+        <div style={{ marginTop: 10, padding: "8px 12px", borderRadius: 8, background: "rgba(224,168,140,0.1)", border: "1px solid rgba(224,168,140,0.35)", color: C.amber, fontSize: 12, fontWeight: 500 }}>
+          ⚠️ Necesită atenție umană — nu răspunde doar cu sugestia AI, citește cu atenție
+        </div>
+      )}
+
+      {c.ai_summary && (
+        <div style={{ color: "#7FA0C4", fontSize: 12.5, marginTop: 10 }}>
+          <strong>Rezumat AI:</strong> {c.ai_summary}
+        </div>
+      )}
+
+      {sentAt ? (
+        <div style={{ color: C.green, fontSize: 12.5, marginTop: 10 }}>✓ Răspuns trimis pe {fmt(sentAt)}</div>
+      ) : c.ai_suggested_reply ? (
+        <div style={{ marginTop: 12 }}>
+          {!showComposer ? (
+            <button type="button" onClick={() => setShowComposer(true)} style={ghostPill}>
+              Vezi răspunsul sugerat de AI
+            </button>
+          ) : (
+            <div>
+              <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} rows={4} className="sv-input" style={{ fontSize: 13, resize: "vertical" }} />
+              {!c.contact_email && (
+                <p style={{ color: C.amber, fontSize: 12, margin: "6px 0" }}>
+                  Acest client nu a lăsat un email — nu poți trimite automat.
+                </p>
+              )}
+              <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+                <button
+                  type="button"
+                  onClick={send}
+                  disabled={sending || !c.contact_email || !replyText.trim()}
+                  style={{
+                    fontSize: 12,
+                    padding: "6px 14px",
+                    borderRadius: 8,
+                    border: "none",
+                    background: C.gold,
+                    color: "#100F0D",
+                    fontWeight: 600,
+                    fontFamily: sans,
+                    cursor: "pointer",
+                    opacity: sending || !c.contact_email || !replyText.trim() ? 0.5 : 1,
+                  }}
+                >
+                  {sending ? "Se trimite..." : "Trimite răspuns"}
+                </button>
+                <button type="button" onClick={() => setShowComposer(false)} style={ghostPill}>Ascunde</button>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function ManagerDemo({ restaurantName }: { restaurantName: string }) {
+  const [complaints, setComplaints] = useState<Complaint[]>(SEED_COMPLAINTS);
+  const [granularity, setGranularity] = useState<Granularity>("day");
+  const scans = useMemo(() => buildDemoScans(), []);
+
+  const setStatus = (id: string, status: ComplaintStatus) =>
+    setComplaints((cs) => cs.map((c) => (c.id === id ? { ...c, status } : c)));
+
+  const totalScans = scans.length;
+  const positiveScans = scans.filter((s) => s.choice === "positive").length;
+  const negativeScans = scans.filter((s) => s.choice === "negative").length;
+  const newComplaints = complaints.filter((c) => c.status === "new").length;
+  const decided = positiveScans + negativeScans;
+  const satisfactionRate = decided > 0 ? Math.round((positiveScans / decided) * 100) : 0;
+
+  const now = Date.now();
+  const last7 = scans.filter((s) => now - new Date(s.created_at).getTime() < 7 * dayMs).length;
+  const prev7 = scans.filter((s) => {
+    const age = now - new Date(s.created_at).getTime();
+    return age >= 7 * dayMs && age < 14 * dayMs;
+  }).length;
+  const trend = prev7 > 0 ? { pct: Math.round(Math.abs(((last7 - prev7) / prev7) * 100)), up: last7 >= prev7 } : null;
+
+  const resolvedComplaints = complaints.filter((c) => c.status === "resolved").length;
+  const visibleComplaints = complaints.filter((c) => c.status !== "resolved");
+
+  const hourlyData = useMemo(() => {
+    const buckets = Array.from({ length: 24 }, (_, h) => ({ hour: h, positive: 0, negative: 0, total: 0 }));
+    for (const s of scans) {
+      const b = buckets[new Date(s.created_at).getHours()];
+      if (!b) continue;
+      b.total += 1;
+      if (s.choice === "positive") b.positive += 1;
+      if (s.choice === "negative") b.negative += 1;
+    }
+    return buckets.map((b) => ({ ...b, label: `${pad(b.hour)}:00` }));
+  }, [scans]);
+
+  const peakHour = useMemo(() => hourlyData.reduce((m, b) => (b.total > m.total ? b : m), hourlyData[0]!), [hourlyData]);
+
+  const timeSeriesData = useMemo(() => {
+    const buckets = emptyBuckets(granularity, WINDOW_SIZE[granularity]);
+    const map = new Map(buckets.map((b) => [b.key, { ...b, positive: 0, negative: 0, total: 0 }]));
+    for (const s of scans) {
+      const { key } = bucketKeyAndLabel(new Date(s.created_at), granularity);
+      const bucket = map.get(key);
+      if (!bucket) continue;
+      bucket.total += 1;
+      if (s.choice === "positive") bucket.positive += 1;
+      if (s.choice === "negative") bucket.negative += 1;
+    }
+    return Array.from(map.values());
+  }, [scans, granularity]);
+
+  const exportCsv = () => {
+    const esc = (v: string) => (/[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
+    const header = ["Data", "Status", "Mesaj", "Nume contact", "Telefon", "Email"];
+    const rows = complaints.map((c) => [
+      new Date(c.created_at).toLocaleString("ro-RO"),
+      STATUS_LABEL[c.status],
+      c.message,
+      c.contact_name ?? "",
+      c.contact_phone ?? "",
+      c.contact_email ?? "",
+    ]);
+    const csv = [header, ...rows].map((r) => r.map((cell) => esc(String(cell))).join(",")).join("\n");
+    const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `reclamatii-demo-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div style={{ background: `radial-gradient(ellipse at 50% 0%, #18140F 0%, ${C.bg} 65%)`, border: `1px solid ${C.border}`, borderRadius: 22, padding: "26px 18px", fontFamily: sans }}>
+      <div style={{ maxWidth: 640, margin: "0 auto" }}>
+        {/* header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28, gap: 12, flexWrap: "wrap" }}>
+          <h3 style={{ fontFamily: serif, color: C.text, fontSize: 26, fontWeight: 600, margin: 0, letterSpacing: "0.01em" }}>{restaurantName}</h3>
+          <button type="button" style={{ ...ghostPill, padding: "7px 14px", fontSize: 12.5 }}>Delogare</button>
+        </div>
+
+        {/* satisfacție */}
+        <section style={{ ...adminCard, marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, position: "relative", overflow: "hidden" }}>
+          <div aria-hidden style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at 15% 30%, rgba(198,161,91,0.08), transparent 60%)", pointerEvents: "none" }} />
+          <div style={{ position: "relative" }}>
+            <div style={{ color: C.muted, fontSize: 12.5, marginBottom: 4 }}>Rată satisfacție</div>
+            <div className="sv-shimmer" style={{ fontFamily: serif, fontSize: 40, fontWeight: 700 }}>
+              <Counter to={satisfactionRate} suffix="%" />
+            </div>
+          </div>
+          {trend && (
+            <div style={{ textAlign: "right", position: "relative" }}>
+              <div style={{ color: trend.up ? C.green : C.amber, fontSize: 15, fontWeight: 600 }}>
+                {trend.up ? "↑" : "↓"} {trend.pct}%
+              </div>
+              <div style={{ color: "#6E6759", fontSize: 11.5 }}>scanări față de săptămâna trecută</div>
+            </div>
+          )}
+        </section>
+
+        {/* stat cards */}
+        <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 20 }}>
+          {[
+            { label: "Scanări totale", value: totalScans, color: "#7FA0C4", pulse: false },
+            { label: "Recenzii Google direcționate", value: positiveScans, color: C.green, pulse: false },
+            { label: "Experiențe negative", value: negativeScans, color: C.amber, pulse: false },
+            { label: "Reclamații necitite", value: newComplaints, color: C.gold, pulse: newComplaints > 0 },
+          ].map((s) => (
+            <div key={s.label} className="sv-lift" style={{ ...adminCard, padding: 18, borderLeft: `2px solid ${s.color}55` }}>
+              <div style={{ color: s.color, fontSize: 26, fontWeight: 600, display: "flex", alignItems: "center", gap: 7 }}>
+                <Counter to={s.value} />
+                {s.pulse && <span style={{ width: 6, height: 6, borderRadius: "50%", background: s.color, boxShadow: `0 0 6px ${s.color}`, animation: "sv-corner 1.6s ease-in-out infinite" }} />}
+              </div>
+              <div style={{ color: C.muted, fontSize: 12, marginTop: 4 }}>{s.label}</div>
+            </div>
+          ))}
+        </section>
+
+        {/* ore de vârf */}
+        <section style={{ ...adminCard, marginBottom: 20 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4, flexWrap: "wrap", gap: 8 }}>
+            <h4 style={{ ...adminTitle, marginBottom: 0 }}>Ore de vârf</h4>
+            {peakHour && peakHour.total > 0 && (
+              <span style={{ color: C.gold, fontSize: 12.5 }}>
+                Cel mai activ interval: {peakHour.label}–{pad((peakHour.hour + 1) % 24)}:00
+              </span>
+            )}
+          </div>
+          <p style={{ color: C.muted, fontSize: 12.5, marginTop: 8, marginBottom: 16 }}>
+            Scanări pe oră din zi, în total (toate datele disponibile).
+          </p>
+          <StackedBars data={hourlyData} height={170} labelEvery={3} />
+        </section>
+
+        {/* scanări în timp */}
+        <section style={{ ...adminCard, marginBottom: 20 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 10 }}>
+            <h4 style={{ ...adminTitle, marginBottom: 0 }}>Scanări în timp</h4>
+            <div style={{ display: "flex", gap: 6 }}>
+              {(Object.keys(GRANULARITY_LABEL) as Granularity[]).map((g) => (
+                <button
+                  key={g}
+                  type="button"
+                  onClick={() => setGranularity(g)}
+                  style={{
+                    fontSize: 12,
+                    padding: "5px 10px",
+                    borderRadius: 999,
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    background: g === granularity ? C.gold : "transparent",
+                    color: g === granularity ? "#100F0D" : C.muted,
+                    cursor: "pointer",
+                    fontFamily: sans,
+                    fontWeight: g === granularity ? 600 : 400,
+                  }}
+                >
+                  {GRANULARITY_LABEL[g]}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <StackedBars data={timeSeriesData} height={190} labelEvery={granularity === "day" ? 4 : 1} />
+
+          <div style={{ overflowX: "auto", marginTop: 16, maxHeight: 220 }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
+              <thead>
+                <tr>
+                  {["Perioadă", "Total", "Pozitive", "Negative", "% pozitive"].map((h) => (
+                    <th key={h} style={{ textAlign: "left", color: C.muted, fontWeight: 500, padding: "6px 8px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[...timeSeriesData].reverse().slice(0, 8).map((row) => (
+                  <tr key={row.key}>
+                    <td style={tdStyle}>{row.label}</td>
+                    <td style={tdStyle}>{row.total}</td>
+                    <td style={{ ...tdStyle, color: C.green }}>{row.positive}</td>
+                    <td style={{ ...tdStyle, color: C.amber }}>{row.negative}</td>
+                    <td style={tdStyle}>{row.total > 0 ? Math.round((row.positive / row.total) * 100) + "%" : "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* setări */}
+        <section style={{ ...adminCard, marginBottom: 20 }}>
+          <h4 style={adminTitle}>Setări</h4>
+          <p style={{ color: C.muted, fontSize: 12.5, marginBottom: 8 }}>Link Google Reviews</p>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <input className="sv-input" defaultValue="https://g.page/r/…/review" style={{ flex: "1 1 220px", fontSize: 13 }} />
+            <button type="button" style={smallPill}>Salvează</button>
+          </div>
+          <p style={{ color: C.muted, fontSize: 12.5, marginTop: 16, marginBottom: 4 }}>Email de alertă reclamații</p>
+          <p style={{ color: "#C9C2B4", fontSize: 13.5, margin: 0 }}>
+            manager@restaurantultau.ro <span style={{ color: "#6E6759" }}>— contactează-ne pentru schimbare</span>
+          </p>
+        </section>
+
+        {/* teme recurente */}
+        <section style={{ ...adminCard, marginBottom: 20 }}>
+          <div style={{ marginBottom: 18 }}>
+            <h4 style={{ fontFamily: serif, color: C.text, fontSize: 19, fontWeight: 600, margin: "0 0 4px" }}>Teme recurente</h4>
+            <p style={{ color: C.muted, fontSize: 12.5, margin: 0 }}>
+              Calculat automat pe {new Date(Date.now() - 2 * dayMs).toLocaleDateString("ro-RO", { day: "numeric", month: "long" })}, din ultimele 30 de zile — actualizat săptămânal.
+            </p>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+            {SEED_THEMES.map((t) => (
+              <ThemeRow key={t.theme} row={t} />
+            ))}
+          </div>
+        </section>
+
+        {/* reclamații */}
+        <section style={adminCard}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
+            <h4 style={{ ...adminTitle, marginBottom: 0 }}>
+              Reclamații ({visibleComplaints.length})
+              {resolvedComplaints > 0 && (
+                <span style={{ color: C.muted, fontSize: 12.5, fontWeight: 400 }}> · {resolvedComplaints} rezolvate, ascunse din listă</span>
+              )}
+            </h4>
+            <button type="button" onClick={exportCsv} style={ghostPill}>Export CSV</button>
+          </div>
+          {visibleComplaints.length === 0 ? (
+            <div>
+              <p style={{ color: C.muted, fontSize: 14 }}>Toate reclamațiile sunt rezolvate — bravo.</p>
+              <button className="sv-btn sv-btn-ghost sv-btn-sm" onClick={() => setComplaints(SEED_COMPLAINTS)}>Reia demo-ul</button>
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {visibleComplaints.map((c) => (
+                <ComplaintCard key={c.id} complaint={c} onStatus={setStatus} />
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+    </div>
+  );
+}
+
+const tdStyle: React.CSSProperties = {
+  padding: "6px 8px",
+  color: C.text,
+  borderBottom: "1px solid rgba(255,255,255,0.04)",
+};
 /* ------------------------------------------------------------------ */
 /* Pagina                                                              */
 /* ------------------------------------------------------------------ */
