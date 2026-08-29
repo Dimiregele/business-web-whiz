@@ -160,7 +160,7 @@ function useInView<T extends HTMLElement>() {
     if (!("IntersectionObserver" in window)) return setSeen(true);
     const io = new IntersectionObserver(
       ([e]) => {
-        if (e.isIntersecting) {
+        if (e?.isIntersecting) {
           setSeen(true);
           io.disconnect();
         }
