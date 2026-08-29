@@ -1,24 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
+import ScanVogueLanding from "../ScanVogueLanding";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "ScanVogue — Mai multe recenzii Google, mai puține surprize proaste" },
+      {
+        name: "description",
+        content:
+          "Un QR pe masă: clienții mulțumiți ajung pe Google, cei nemulțumiți îți scriu ție. Panou de manager cu analiză AI, teme recurente și rapoarte lunare.",
+      },
+      { property: "og:title", content: "ScanVogue — Sistemul de recenzii pentru restaurante" },
+      {
+        property: "og:description",
+        content:
+          "Demo funcțional: pagina clientului și panoul de manager. Bazat pe studii reale despre impactul recenziilor asupra încasărilor.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: ScanVogueLanding,
 });
-
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
